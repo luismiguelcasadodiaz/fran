@@ -19,6 +19,11 @@ Esto dificulta la extracción de datos. Tendría que hacer uso del webdriver de 
 
 Una vez identificado el `infinit-scroll-component`,  manualmente hago scroll hasta el final de los expositores. Cuando visualizo "Zoup! Good, Really Good", en el `web developer tool`, sobre el `infinite-scroll-component` con el botón de la derecha `Edito como HTML`. Lo selecciono todo con `CTRL + SHIFT + FIN`. Lo copio todo al portapapeles con `CTRL + C`. Abro `Vim` y lo pego con `CTRL + SHIFT + V`. Los 4 806 442 carácteres de codigo HTML que contenía el `infinit-scroll-component`, se quedan en una única línea dentro de Vim, en un fichero al que he llamado todo.html.
 
+![image](https://github.com/user-attachments/assets/4a853d7c-826e-4e16-9e25-dfcf10758a51)
+
+Necesito insertar saltos de linea entre las etiquetas HTML.  el comando Vim `% s/></>\r</g` lo soluciona.
+
+![image](https://github.com/user-attachments/assets/83c6cd05-5fb6-4a31-b129-5927f0125083)
 
 
 Esto me permite ver qué codigo HTML se usa para mostrar individualmente cada uno de los expositores.
@@ -33,7 +38,7 @@ Me interesa de cada ficha individual:
 
  ## Transformando formatos
  
- Creo un script Python para que me extraiga la informacion relevante ( 333 761 carácters de los 4 806 442). Voy a leer ('r') el fichero "todo.html" y crear ('w') el fichero  "lista.csv"
+ Creo un script Python para que me extraiga la informacion relevante ( 333 761 carácters de los 4 806 442). Voy a leer ('r') el fichero "todo.html" y crear ('w') el fichero  "lista.tsv"
  
 ```python
 def main():
@@ -74,13 +79,9 @@ def extract_exhibitor_data(file):
     exhibitor_details = soup.find_all('a', href=True)  # Adjust class name if needed
     data = []
     for exhibitor in exhibitor_details:
-        # Extract name (assuming it's in a heading)
-        #url_element = exhibitor.find('a')  # Adjust tag if name is not in h3
         url = exhibitor.get('href') if exhibitor else None
 
-
         spans = exhibitor.find_all('span')  # Adjust tag if name is not in h3
-
         if len(spans) == 2:
             name = spans[0].text.strip() if spans[0] else None
             sponsor = None
@@ -89,6 +90,24 @@ def extract_exhibitor_data(file):
             name = spans[0].text.strip() if spans[0] else None
             sponsor = spans[1].text.strip() if spans[1] else None
             booth_number = spans[2].text.strip() if spans[2] else None
-        data.append({'name': name, 'sponsor':sponsor, 'booth_number': booth_number, 'url':url})  # Add extracted data to dictionary
 
+        data.append({'name': name, 'sponsor':sponsor, 'booth_number': booth_number, 'url':url})  # Add extracted data to dictionary
     return data
+
+## Segunda vuelta
+
+Leeremos el fichero "lista.tsv". probamos con expositores
+
+``python
+with open('lista.tsv', 'r') as file:
+    exhibitors = 0
+    for exhibitor in file:
+        name, sponsor, stand, link = exhibitor.strip().split("\t")
+        exhibitors +=1
+        base_url = "https://attend.expowest.com" +link[1:-1]
+        data = extract_exhibitor_data(base_url)
+        #print(name, sponsor, stand, link)
+        if exhibitors == 7:
+            break
+```
+
