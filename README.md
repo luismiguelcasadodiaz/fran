@@ -53,6 +53,7 @@ def main():
 if __name__ == '__main__':
     main()
 ```
+
 El fichero "lista.csv" tiene este aspecto:
 
 ![image](https://github.com/user-attachments/assets/51a2a0e3-569a-4807-9a46-7f8abebd0001)
@@ -93,16 +94,20 @@ def extract_exhibitor_data(file):
 
         data.append({'name': name, 'sponsor':sponsor, 'booth_number': booth_number, 'url':url})  # Add extracted data to dictionary
     return data
+```
 
 ## Segunda vuelta
 
-Leeremos el fichero "lista.tsv". probamos con expositores
+Leeremos el fichero "lista.tsv". 
+
+Para cada Expositor abriremos su ficha
 
 ``python
 with open('lista.tsv', 'r') as file:
     exhibitors = 0
     for exhibitor in file:
         name, sponsor, stand, link = exhibitor.strip().split("\t")
+        time.sleep(1+2*random.random())
         exhibitors +=1
         base_url = "https://attend.expowest.com" +link[1:-1]
         data = extract_exhibitor_data(base_url)
