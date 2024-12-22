@@ -102,7 +102,7 @@ Leeremos el fichero "lista.tsv".
 
 Para cada Expositor abriremos su ficha
 
-``python
+```python
 with open('lista.tsv', 'r') as file:
     exhibitors = 0
     for exhibitor in file:
